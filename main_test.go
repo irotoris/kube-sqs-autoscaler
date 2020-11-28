@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"kube-sqs-autoscaler/scale"
+	kubesqs "kube-sqs-autoscaler/sqs"
 	"testing"
 	"time"
 
@@ -12,9 +14,6 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	fake "k8s.io/client-go/kubernetes/fake"
-
-	"kube-sqs-autoscaler/scale"
-	mainsqs "kube-sqs-autoscaler/sqs"
 )
 
 func TestRunReachMinReplicas(t *testing.T) {
@@ -191,10 +190,10 @@ func (m *MockSQS) SetQueueAttributes(input *sqs.SetQueueAttributesInput) (*sqs.S
 	return &sqs.SetQueueAttributesOutput{}, nil
 }
 
-func NewMockSqsClient() *mainsqs.SqsClient {
+func NewMockSqsClient() *kubesqs.SqsClient {
 	Attributes := map[string]*string{"ApproximateNumberOfMessages": aws.String("50")}
 
-	return &mainsqs.SqsClient{
+	return &kubesqs.SqsClient{
 		Client: &MockSQS{
 			QueueAttributes: &sqs.GetQueueAttributesOutput{
 				Attributes: Attributes,

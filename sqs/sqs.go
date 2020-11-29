@@ -22,7 +22,7 @@ type SqsClient struct {
 }
 
 func NewSqsClient(queue string, region string) *SqsClient {
-	svc := sqs.New(session.New(), &aws.Config{Region: aws.String(region)})
+	svc := sqs.New(session.Must(session.NewSession()), aws.NewConfig().WithRegion(region))
 	return &SqsClient{
 		svc,
 		queue,

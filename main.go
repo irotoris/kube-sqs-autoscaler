@@ -34,43 +34,40 @@ func Run(p *scale.PodAutoScaler, sqs *kubesqs.SqsClient) {
 	lastScaleDownTime := time.Now()
 
 	for {
-		select {
-		case <-time.After(pollInterval):
-			{
-				numMessages, err := sqs.NumMessages()
-				if err != nil {
-					log.Errorf("Failed to get SQS messages: %v", err)
-					continue
-				}
+		time.Sleep(pollInterval)
 
-				if numMessages >= scaleUpMessages {
-					if lastScaleUpTime.Add(scaleUpCoolPeriod).After(time.Now()) {
-						log.Info("Waiting for cool down, skipping scale up ")
-						continue
-					}
+		numMessages, err := sqs.NumMessages()
+		if err != nil {
+			log.Errorf("Failed to get SQS messages: %v", err)
+			continue
+		}
 
-					if err := p.ScaleUp(ctx); err != nil {
-						log.Errorf("Failed scaling up: %v", err)
-						continue
-					}
-
-					lastScaleUpTime = time.Now()
-				}
-
-				if numMessages <= scaleDownMessages {
-					if lastScaleDownTime.Add(scaleDownCoolPeriod).After(time.Now()) {
-						log.Info("Waiting for cool down, skipping scale down")
-						continue
-					}
-
-					if err := p.ScaleDown(ctx); err != nil {
-						log.Errorf("Failed scaling down: %v", err)
-						continue
-					}
-
-					lastScaleDownTime = time.Now()
-				}
+		if numMessages >= scaleUpMessages {
+			if lastScaleUpTime.Add(scaleUpCoolPeriod).After(time.Now()) {
+				log.Info("Waiting for cool down, skipping scale up ")
+				continue
 			}
+
+			if err := p.ScaleUp(ctx); err != nil {
+				log.Errorf("Failed scaling up: %v", err)
+				continue
+			}
+
+			lastScaleUpTime = time.Now()
+		}
+
+		if numMessages <= scaleDownMessages {
+			if lastScaleDownTime.Add(scaleDownCoolPeriod).After(time.Now()) {
+				log.Info("Waiting for cool down, skipping scale down")
+				continue
+			}
+
+			if err := p.ScaleDown(ctx); err != nil {
+				log.Errorf("Failed scaling down: %v", err)
+				continue
+			}
+
+			lastScaleDownTime = time.Now()
 		}
 	}
 

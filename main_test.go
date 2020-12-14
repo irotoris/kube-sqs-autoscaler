@@ -46,7 +46,7 @@ func TestRunReachMinReplicas(t *testing.T) {
 	input := &sqs.SetQueueAttributesInput{
 		Attributes: Attributes,
 	}
-	s.Client.SetQueueAttributes(input)
+	_, _ = s.Client.SetQueueAttributes(input)
 
 	time.Sleep(10 * time.Second)
 	deployment, _ := p.Client.Get(ctx, "deploy", metav1.GetOptions{})
@@ -83,7 +83,7 @@ func TestRunReachMaxReplicas(t *testing.T) {
 	input := &sqs.SetQueueAttributesInput{
 		Attributes: Attributes,
 	}
-	s.Client.SetQueueAttributes(input)
+	_, _ = s.Client.SetQueueAttributes(input)
 
 	time.Sleep(10 * time.Second)
 	deployment, _ := p.Client.Get(ctx, "deploy", metav1.GetOptions{})
@@ -119,7 +119,7 @@ func TestRunScaleUpCoolDown(t *testing.T) {
 	input := &sqs.SetQueueAttributesInput{
 		Attributes: Attributes,
 	}
-	s.Client.SetQueueAttributes(input)
+	_, _ = s.Client.SetQueueAttributes(input)
 
 	time.Sleep(15 * time.Second)
 	deployment, _ := p.Client.Get(ctx, "deploy", metav1.GetOptions{})
@@ -155,7 +155,7 @@ func TestRunScaleDownCoolDown(t *testing.T) {
 	input := &sqs.SetQueueAttributesInput{
 		Attributes: Attributes,
 	}
-	s.Client.SetQueueAttributes(input)
+	_, _ = s.Client.SetQueueAttributes(input)
 
 	time.Sleep(15 * time.Second)
 	deployment, _ := p.Client.Get(ctx, "deploy", metav1.GetOptions{})

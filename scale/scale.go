@@ -91,7 +91,7 @@ func (p *PodAutoScaler) ScaleDown(ctx context.Context) error {
 		return nil
 	}
 
-	nextReplicas := *currentReplicas - int32(p.Min)
+	nextReplicas := *currentReplicas - int32(p.ScaleDownPods)
 	if nextReplicas < int32(p.Min) {
 		nextReplicas = int32(p.Min)
 	}

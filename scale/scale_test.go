@@ -32,6 +32,22 @@ func TestScaleUp(t *testing.T) {
 	assert.Equal(t, int32(5), *deployment.Spec.Replicas)
 }
 
+func TestScaleUpWithScalingPodNum(t *testing.T) {
+	ctx := context.Background()
+	p := NewMockPodAutoScaler("deploy", "namespace", 10, 1, 3, 5, 5)
+
+	// Scale up replicas until we reach the max (10) with 5 pods scaling
+	err := p.ScaleUp(ctx)
+	deployment, _ := p.Client.Get(ctx, "deploy", metav1.GetOptions{})
+	assert.Nil(t, err)
+	assert.Equal(t, int32(8), *deployment.Spec.Replicas)
+
+	err = p.ScaleUp(ctx)
+	deployment, _ = p.Client.Get(ctx, "deploy", metav1.GetOptions{})
+	assert.Nil(t, err)
+	assert.Equal(t, int32(10), *deployment.Spec.Replicas)
+}
+
 func TestScaleDown(t *testing.T) {
 	ctx := context.Background()
 	p := NewMockPodAutoScaler("deploy", "namespace", 5, 1, 3, 1, 1)
@@ -44,6 +60,21 @@ func TestScaleDown(t *testing.T) {
 	assert.Nil(t, err)
 	deployment, _ = p.Client.Get(ctx, "deploy", metav1.GetOptions{})
 	assert.Equal(t, int32(1), *deployment.Spec.Replicas)
+
+	err = p.ScaleDown(ctx)
+	assert.Nil(t, err)
+	deployment, _ = p.Client.Get(ctx, "deploy", metav1.GetOptions{})
+	assert.Equal(t, int32(1), *deployment.Spec.Replicas)
+}
+
+func TestScaleDownWithScalingPodNum(t *testing.T) {
+	ctx := context.Background()
+	p := NewMockPodAutoScaler("deploy", "namespace", 10, 1, 8, 5, 5)
+
+	err := p.ScaleDown(ctx)
+	assert.Nil(t, err)
+	deployment, _ := p.Client.Get(ctx, "deploy", metav1.GetOptions{})
+	assert.Equal(t, int32(3), *deployment.Spec.Replicas)
 
 	err = p.ScaleDown(ctx)
 	assert.Nil(t, err)

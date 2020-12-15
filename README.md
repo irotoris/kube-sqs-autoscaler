@@ -45,6 +45,8 @@ spec:
           - --scale-up-cool-down=5m # optional
           - --scale-up-messages=100 # optional
           - --scale-down-messages=10 # optional
+          - --scale-up-pods=1 # optional
+          - --scale-down-pods=1 # optional
           - --max-pods=5 # optional
           - --min-pods=1 # optional
         env:

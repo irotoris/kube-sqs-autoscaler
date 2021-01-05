@@ -2,6 +2,8 @@
 
 Kubernetes pod autoscaler based on queue size in AWS SQS. It periodically retrieves the number of messages in your queue and scales pods accordingly.
 
+Forked https://github.com/Wattpad/kube-sqs-autoscaler
+
 ## Setting up
 
 Setting up kube-sqs-autoscaler requires two steps:
@@ -61,14 +63,6 @@ spec:
           limits:
             memory: "200Mi"
             cpu: "100m"
-        volumeMounts:
-          - name: ssl-certs
-            mountPath: /etc/ssl/certs/ca-certificates.crt
-            readOnly: true
-      volumes:
-        - name: ssl-certs
-          hostPath:
-            path: "/etc/ssl/certs/ca-certificates.crt"
 ```
 
 ### Permissions

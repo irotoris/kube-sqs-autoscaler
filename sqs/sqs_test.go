@@ -45,6 +45,7 @@ func NewMockSqsClient() *SqsClient {
 				Attributes: Attributes,
 			},
 		},
-		QueueUrl: "example.com",
+		QueueUrl:       "example.com",
+		AttributeNames: defaultAttributeNames,
 	}
 }

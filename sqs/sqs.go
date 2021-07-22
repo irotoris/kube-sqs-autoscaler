@@ -23,12 +23,24 @@ type SqsClient struct {
 	AttributeNames []*string
 }
 
+var (
+	defaultAttributeNames []*string = []*string{
+		aws.String("ApproximateNumberOfMessages"),
+		aws.String("ApproximateNumberOfMessagesDelayed"),
+		aws.String("ApproximateNumberOfMessagesNotVisible"),
+	}
+)
+
 func NewSqsClient(queue string, region string, attributeNames string) *SqsClient {
 	svc := sqs.New(session.Must(session.NewSession()), aws.NewConfig().WithRegion(region))
 
 	attrNames := []*string{}
 	for _, attr := range strings.Split(attributeNames, ",") {
 		attrNames = append(attrNames, aws.String(strings.TrimSpace(attr)))
+	}
+
+	if len(attrNames) == 0 {
+		attrNames = defaultAttributeNames
 	}
 
 	return &SqsClient{

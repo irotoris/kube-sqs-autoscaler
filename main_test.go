@@ -299,5 +299,10 @@ func NewMockSqsClient() *kubesqs.SqsClient {
 			},
 		},
 		QueueUrl: "example.com",
+		AttributeNames: []*string{
+			aws.String("ApproximateNumberOfMessages"),
+			aws.String("ApproximateNumberOfMessagesDelayed"),
+			aws.String("ApproximateNumberOfMessagesNotVisible"),
+		},
 	}
 }

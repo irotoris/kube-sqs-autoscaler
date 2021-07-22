@@ -22,6 +22,7 @@ var (
 	maxPods             int
 	minPods             int
 	awsRegion           string
+	attributeNames      string
 
 	sqsQueueUrl              string
 	kubernetesDeploymentName string
@@ -84,6 +85,7 @@ func main() {
 	flag.IntVar(&maxPods, "max-pods", 5, "Max pods that kube-sqs-autoscaler can scale")
 	flag.IntVar(&minPods, "min-pods", 1, "Min pods that kube-sqs-autoscaler can scale")
 	flag.StringVar(&awsRegion, "aws-region", "", "Your AWS region")
+	flag.StringVar(&attributeNames, "attribute-names", "ApproximateNumberOfMessages,ApproximateNumberOfMessagesDelayed,ApproximateNumberOfMessagesNotVisible", "A comma-separated list of queue attribute names to query in calculating the number of messages")
 
 	flag.StringVar(&sqsQueueUrl, "sqs-queue-url", "", "The sqs queue url")
 	flag.StringVar(&kubernetesDeploymentName, "kubernetes-deployment", "", "Kubernetes Deployment to scale. This field is required")
@@ -92,7 +94,7 @@ func main() {
 	flag.Parse()
 
 	p := scale.NewPodAutoScaler(kubernetesDeploymentName, kubernetesNamespace, maxPods, minPods, scaleUpPods, scaleDownPods)
-	sqs := kubesqs.NewSqsClient(sqsQueueUrl, awsRegion)
+	sqs := kubesqs.NewSqsClient(sqsQueueUrl, awsRegion, attributeNames)
 
 	log.Info("Starting kube-sqs-autoscaler")
 	Run(p, sqs)

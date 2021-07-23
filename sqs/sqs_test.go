@@ -8,6 +8,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestNewSqsClient(t *testing.T) {
+	queue := "queue"
+	s := NewSqsClient(queue, "region", DefaultAttributeNames)
+
+	assert.Equal(t, s.QueueUrl, queue)
+	assert.Equal(t, s.AttributeNames, DefaultAttributeNames)
+}
+
 func TestNumMessages(t *testing.T) {
 	s := NewMockSqsClient()
 
@@ -46,6 +54,6 @@ func NewMockSqsClient() *SqsClient {
 			},
 		},
 		QueueUrl:       "example.com",
-		AttributeNames: defaultAttributeNames,
+		AttributeNames: DefaultAttributeNames,
 	}
 }

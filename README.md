@@ -51,6 +51,7 @@ spec:
           - --scale-down-pods=1 # optional
           - --max-pods=5 # optional
           - --min-pods=1 # optional
+          - --attribute-names=ApproximateNumberOfMessages # optional; defaults to ApproximateNumberOfMessages,ApproximateNumberOfMessagesDelayed,ApproximateNumberOfMessagesNotVisible
         env:
           - name: POD_NAMESPACE
             valueFrom:

@@ -3,25 +3,29 @@ package main
 import (
 	"context"
 	"flag"
+	"strings"
 	"time"
 
 	"kube-sqs-autoscaler/scale"
 	kubesqs "kube-sqs-autoscaler/sqs"
 
+	"github.com/aws/aws-sdk-go/aws"
 	log "github.com/sirupsen/logrus"
 )
 
 var (
-	pollInterval        time.Duration
-	scaleDownCoolPeriod time.Duration
-	scaleUpCoolPeriod   time.Duration
-	scaleUpMessages     int
-	scaleDownMessages   int
-	scaleUpPods         int
-	scaleDownPods       int
-	maxPods             int
-	minPods             int
-	awsRegion           string
+	pollInterval          time.Duration
+	scaleDownCoolPeriod   time.Duration
+	scaleUpCoolPeriod     time.Duration
+	scaleUpMessages       int
+	scaleDownMessages     int
+	scaleUpPods           int
+	scaleDownPods         int
+	maxPods               int
+	minPods               int
+	awsRegion             string
+	attributeNames        string
+	defaultAttributeNames string = "ApproximateNumberOfMessages,ApproximateNumberOfMessagesDelayed,ApproximateNumberOfMessagesNotVisible"
 
 	sqsQueueUrl              string
 	kubernetesDeploymentName string
@@ -84,6 +88,7 @@ func main() {
 	flag.IntVar(&maxPods, "max-pods", 5, "Max pods that kube-sqs-autoscaler can scale")
 	flag.IntVar(&minPods, "min-pods", 1, "Min pods that kube-sqs-autoscaler can scale")
 	flag.StringVar(&awsRegion, "aws-region", "", "Your AWS region")
+	flag.StringVar(&attributeNames, "attribute-names", defaultAttributeNames, "A comma-separated list of queue attribute names to query in calculating the number of messages")
 
 	flag.StringVar(&sqsQueueUrl, "sqs-queue-url", "", "The sqs queue url")
 	flag.StringVar(&kubernetesDeploymentName, "kubernetes-deployment", "", "Kubernetes Deployment to scale. This field is required")
@@ -92,7 +97,17 @@ func main() {
 	flag.Parse()
 
 	p := scale.NewPodAutoScaler(kubernetesDeploymentName, kubernetesNamespace, maxPods, minPods, scaleUpPods, scaleDownPods)
-	sqs := kubesqs.NewSqsClient(sqsQueueUrl, awsRegion)
+
+	attrNames := kubesqs.DefaultAttributeNames
+
+	if attributeNames != defaultAttributeNames {
+		attrNames = []*string{}
+		for _, attr := range strings.Split(attributeNames, ",") {
+			attrNames = append(attrNames, aws.String(strings.TrimSpace(attr)))
+		}
+	}
+
+	sqs := kubesqs.NewSqsClient(sqsQueueUrl, awsRegion, attrNames)
 
 	log.Info("Starting kube-sqs-autoscaler")
 	Run(p, sqs)

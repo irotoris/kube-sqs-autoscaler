@@ -298,6 +298,7 @@ func NewMockSqsClient() *kubesqs.SqsClient {
 				Attributes: Attributes,
 			},
 		},
-		QueueUrl: "example.com",
+		QueueUrl:       "example.com",
+		AttributeNames: kubesqs.DefaultAttributeNames,
 	}
 }

@@ -1,6 +1,7 @@
 package sqs
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -17,25 +18,34 @@ type SQS interface {
 }
 
 type SqsClient struct {
-	Client   SQS
-	QueueUrl string
+	Client         SQS
+	QueueUrl       string
+	AttributeNames []*string
 }
 
-func NewSqsClient(queue string, region string) *SqsClient {
+var (
+	// DefaultAttributeNames define common default attribute names to pass to NewSqsClient.
+	DefaultAttributeNames []*string = []*string{
+		aws.String("ApproximateNumberOfMessages"),
+		aws.String("ApproximateNumberOfMessagesDelayed"),
+		aws.String("ApproximateNumberOfMessagesNotVisible"),
+	}
+)
+
+func NewSqsClient(queue string, region string, attributeNames []*string) *SqsClient {
 	svc := sqs.New(session.Must(session.NewSession()), aws.NewConfig().WithRegion(region))
+
 	return &SqsClient{
 		svc,
 		queue,
+		attributeNames,
 	}
 }
 
 func (s *SqsClient) NumMessages() (int, error) {
 	params := &sqs.GetQueueAttributesInput{
-		AttributeNames: []*string{
-			aws.String("ApproximateNumberOfMessages"),
-			aws.String("ApproximateNumberOfMessagesDelayed"),
-			aws.String("ApproximateNumberOfMessagesNotVisible")},
-		QueueUrl: aws.String(s.QueueUrl),
+		AttributeNames: s.AttributeNames,
+		QueueUrl:       aws.String(s.QueueUrl),
 	}
 
 	out, err := s.Client.GetQueueAttributes(params)
@@ -43,22 +53,15 @@ func (s *SqsClient) NumMessages() (int, error) {
 		return 0, errors.Wrap(err, "Failed to get messages in SQS")
 	}
 
-	approximateNumberOfMessages, err := strconv.Atoi(*out.Attributes["ApproximateNumberOfMessages"])
-	if err != nil {
-		return 0, errors.Wrap(err, "Failed to get number of messages in queue")
-	}
+	var messages int
+	for _, attr := range s.AttributeNames {
+		approximateNumberOfMessages, err := strconv.Atoi(*out.Attributes[*attr])
+		if err != nil {
+			return 0, errors.Wrap(err, fmt.Sprintf("Failed to get '%s' number of messages in queue", *attr))
+		}
 
-	approximateNumberOfMessagesDelayed, err := strconv.Atoi(*out.Attributes["ApproximateNumberOfMessagesDelayed"])
-	if err != nil {
-		return 0, errors.Wrap(err, "Failed to get number of messages in queue")
+		messages = messages + approximateNumberOfMessages
 	}
-
-	approximateNumberOfMessagesNotVisible, err := strconv.Atoi(*out.Attributes["ApproximateNumberOfMessagesNotVisible"])
-	if err != nil {
-		return 0, errors.Wrap(err, "Failed to get number of messages in queue")
-	}
-
-	messages := approximateNumberOfMessages + approximateNumberOfMessagesDelayed + approximateNumberOfMessagesNotVisible
 
 	return messages, nil
 }

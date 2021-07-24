@@ -162,7 +162,7 @@ func TestRunScaleDownCoolDown(t *testing.T) {
 	assert.Equal(t, int32(2), *deployment.Spec.Replicas, "Number of replicas should be 2 if cool down for scaling down was obeyed")
 }
 
-func TestRunReachMinReplicasWithScaleingPodNum(t *testing.T) {
+func TestRunReachMinReplicasWithScalingPodNum(t *testing.T) {
 	ctx := context.Background()
 	pollInterval = 1 * time.Second
 	scaleDownCoolPeriod = 1 * time.Second
@@ -200,7 +200,7 @@ func TestRunReachMinReplicasWithScaleingPodNum(t *testing.T) {
 	assert.Equal(t, int32(minPods), *deployment.Spec.Replicas, "Number of replicas should be the min")
 }
 
-func TestRunReachMaxReplicasWithScaleingPodNum(t *testing.T) {
+func TestRunReachMaxReplicasWithScalingPodNum(t *testing.T) {
 	ctx := context.Background()
 	pollInterval = 1 * time.Second
 	scaleDownCoolPeriod = 1 * time.Second

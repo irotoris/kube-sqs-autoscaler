@@ -54,7 +54,7 @@ func NewPodAutoScaler(kubernetesDeploymentName string, kubernetesNamespace strin
 func (p *PodAutoScaler) ScaleUp(ctx context.Context) error {
 	deployment, err := p.Client.Get(ctx, p.Deployment, metav1.GetOptions{})
 	if err != nil {
-		return errors.Wrap(err, "Failed to get deployment from kube server, no scale up occured")
+		return errors.Wrap(err, "Failed to get deployment from kube server, no scale up occurred")
 	}
 
 	currentReplicas := deployment.Spec.Replicas
@@ -81,7 +81,7 @@ func (p *PodAutoScaler) ScaleUp(ctx context.Context) error {
 func (p *PodAutoScaler) ScaleDown(ctx context.Context) error {
 	deployment, err := p.Client.Get(ctx, p.Deployment, metav1.GetOptions{})
 	if err != nil {
-		return errors.Wrap(err, "Failed to get deployment from kube server, no scale down occured")
+		return errors.Wrap(err, "Failed to get deployment from kube server, no scale down occurred")
 	}
 
 	currentReplicas := deployment.Spec.Replicas

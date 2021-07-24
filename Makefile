@@ -12,7 +12,7 @@ clean:
 compile: clean
 	GOOS=linux go build .
 
-build: compile
+build: clean
 	docker build -t $(IMAGE):$(VERSION) .
 
 push: build

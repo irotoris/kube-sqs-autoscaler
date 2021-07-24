@@ -13,7 +13,7 @@ Setting up kube-sqs-autoscaler requires two steps:
 
 ### Deploying kube-sqs-autoscaler
 
-Deployin kube-sqs-autoscaler should be as simple as applying this deployment:
+Deploy in kube-sqs-autoscaler should be as simple as applying this deployment:
 
 ```yaml
 ---
@@ -41,7 +41,7 @@ spec:
           - --sqs-queue-url=https://sqs.your_aws_region.amazonaws.com/your_aws_account_number/your_queue_name  # required
           - --kubernetes-deployment=your-kubernetes-deployment-name # required
           - --kubernetes-namespace=$(POD_NAMESPACE) # optional
-          - --aws-region=us-west-1  #required
+          - --aws-region=your_aws_region  #required
           - --poll-period=5s # optional
           - --scale-down-cool-down=30s # optional
           - --scale-up-cool-down=5m # optional

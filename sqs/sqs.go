@@ -13,7 +13,7 @@ import (
 
 type SQS interface {
 	GetQueueAttributes(*sqs.GetQueueAttributesInput) (*sqs.GetQueueAttributesOutput, error)
-	// only implemented on unit tests
+	// SetQueueAttributes is only implemented on unit tests
 	SetQueueAttributes(*sqs.SetQueueAttributesInput) (*sqs.SetQueueAttributesOutput, error)
 }
 

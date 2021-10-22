@@ -1,7 +1,7 @@
 .PHONY: test clean compile build push
 
 IMAGE=irotoris/kube-sqs-autoscaler
-VERSION=v2.2.0
+VERSION=v2.2.1
 
 test:
 	go test ./...

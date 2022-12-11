@@ -1,7 +1,7 @@
 .PHONY: test clean compile build push
 
 IMAGE=irotoris/kube-sqs-autoscaler
-VERSION=v2.2.1
+TAG := latest
 
 test:
 	go test ./...
@@ -13,7 +13,7 @@ compile: clean
 	GOOS=linux go build .
 
 build: clean
-	docker build -t $(IMAGE):$(VERSION) .
+	docker build -t $(IMAGE):$(TAG) .
 
 push: build
-	docker push $(IMAGE):$(VERSION)
+	docker push $(IMAGE):$(TAG)

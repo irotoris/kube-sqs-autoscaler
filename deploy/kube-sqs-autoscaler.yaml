@@ -1,0 +1,86 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kube-sqs-autoscaler
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: kube-sqs-autoscaler
+rules:
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "watch", "list", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: kube-sqs-autoscaler
+subjects:
+  - kind: ServiceAccount
+    name: kube-sqs-autoscaler
+roleRef:
+  kind: Role
+  name: kube-sqs-autoscaler
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: kube-sqs-autoscaler
+data:
+  # your aws access key base64 encrypted
+  #AWS_ACCESS_KEY_ID: ""
+  #AWS_SECRET_ACCESS_KEY: ""
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kube-sqs-autoscaler
+  labels:
+    app: kube-sqs-autoscaler
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kube-sqs-autoscaler
+  template:
+    metadata:
+      labels:
+        app: kube-sqs-autoscaler
+    spec:
+      serviceAccountName: kube-sqs-autoscaler
+      containers:
+        - name: kube-sqs-autoscaler
+          image: irotoris/kube-sqs-autoscaler:latest
+          command:
+            - /kube-sqs-autoscaler
+            - --sqs-queue-url=https://sqs.your_aws_region.amazonaws.com/your_aws_account_number/your_queue_name  # required
+            - --kubernetes-deployment=your-kubernetes-deployment-name # required
+            - --kubernetes-namespace=$(POD_NAMESPACE) # optional
+            - --aws-region=your_aws_region  #required
+            - --poll-period=5s # optional
+            - --scale-down-cool-down=30s # optional
+            - --scale-up-cool-down=5m # optional
+            - --scale-up-messages=100 # optional
+            - --scale-down-messages=10 # optional
+            - --scale-up-pods=1 # optional
+            - --scale-down-pods=1 # optional
+            - --max-pods=5 # optional
+            - --min-pods=1 # optional
+            - --attribute-names=ApproximateNumberOfMessages # optional; defaults to ApproximateNumberOfMessages,ApproximateNumberOfMessagesDelayed,ApproximateNumberOfMessagesNotVisible
+          envFrom:
+            - secretRef:
+                name: kube-sqs-autoscaler
+          env:
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          resources:
+            requests:
+              memory: "200Mi"
+              cpu: "100m"
+            limits:
+              memory: "200Mi"
+              cpu: "100m"

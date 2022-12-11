@@ -13,10 +13,9 @@ Setting up kube-sqs-autoscaler requires two steps:
 
 ### Deploying kube-sqs-autoscaler
 
-Deploy in kube-sqs-autoscaler should be as simple as applying this deployment:
+Deploy in kube-sqs-autoscaler, see [./deploykube-sqs-autoscaler.yaml](./deploy/kube-sqs-autoscaler.yaml) and set your parameters.
 
 ```yaml
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -33,9 +32,10 @@ spec:
       labels:
         app: kube-sqs-autoscaler
     spec:
+      serviceAccountName: kube-sqs-autoscaler
       containers:
       - name: kube-sqs-autoscaler
-        image: irotoris/kube-sqs-autoscaler:v2.2.0
+        image: irotoris/kube-sqs-autoscaler:latest
         command:
           - /kube-sqs-autoscaler
           - --sqs-queue-url=https://sqs.your_aws_region.amazonaws.com/your_aws_account_number/your_queue_name  # required
@@ -66,6 +66,8 @@ spec:
             cpu: "100m"
 ```
 
+Set base64 encrypted `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` to secret resource if you use IAM User and access keys.
+
 ### Permissions
 
 Next you want to attach this policy so kube-sqs-autoscaler can retreive SQS attributes:
@@ -80,3 +82,5 @@ Next you want to attach this policy so kube-sqs-autoscaler can retreive SQS attr
     }]
 }
 ```
+
+Set base64 encrypted `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` to secret resource if you use IAM User and access keys.

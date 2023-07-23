@@ -1,4 +1,4 @@
-FROM golang:1.19-alpine3.17 AS builder
+FROM golang:1.20-alpine3.17 AS builder
 WORKDIR /work
 COPY . /work
 RUN CGO_ENABLED=0 GOOS=linux go build -o kube-sqs-autoscaler
